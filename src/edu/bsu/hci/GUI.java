@@ -1,23 +1,19 @@
 package edu.bsu.hci;
 
 import javafx.application.Application;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
 import java.util.ArrayList;
-
 
 public class GUI extends Application {
     private final TextField numberOfAssignmentsField = new TextField();
     private final TextField numberOfAssignmentsCompletedField = new TextField();
     private Stage primaryStage = new Stage();
     private Gradebook gradebook = new Gradebook();
-    private ArrayList<TextField> listOfAssignmentScoredField = new ArrayList<>();
-
+    private final ArrayList<TextField> listOfAssignmentScoredField = new ArrayList<>();
 
     @Override
     public void start(Stage stage) {
@@ -75,7 +71,6 @@ public class GUI extends Application {
         scrollPane.setMinWidth(390);
         Button button = new Button("Done");
         button.setOnAction(event -> retrieveAssignmentScoresFromField());
-        ScrollPane sp = new ScrollPane();
         for (int i = 1; i <= gradebook.getNumberOfAssignmentsCompleted(); i++) {
             TextField scoreTextfield = new TextField();
             listOfAssignmentScoredField.add(scoreTextfield);
@@ -104,7 +99,7 @@ public class GUI extends Application {
                     gparser.parseNumberOnly(assignment.getText())
             );
         }
-        gradebook.setPointsEarned();
+        gradebook.setAssignmentPointsEarned();
         changeScene(modifiedGradeBookView());
     }
 
@@ -115,32 +110,42 @@ public class GUI extends Application {
         scrollPane.setMinWidth(225);
         Button button = new Button("See Short-term Grade");
         button.setOnAction(event -> changeScene(fullGradebookView()));
+        Button button1 = new Button("What's long-term grading?");
+        button1.setOnAction(event -> showLongTermInformationDialogue());
+        GradebookFormatter gformatter = new GradebookFormatter();
         vBox.getChildren().addAll(
-                new Label(gradebook.reportAllAssinments()),
+                new Label(gformatter.reportAllAssinments(gradebook)),
                 new Label("Long Term Grade: => " + gradebook.calculateLongTermGrade() + "%"),
+                button1,
                 button);
         return new Scene(scrollPane);
     }
 
-    private void showWarningDialogue() {
+    private void showShortTermWarningDialogue() {
         Alert errorAlert = new Alert(Alert.AlertType.WARNING);
         errorAlert.setHeaderText("Please Read!");
         errorAlert.setContentText(gradebook.getShortTermGradeWarningMessage());
         errorAlert.showAndWait();
     }
 
+    private void showLongTermInformationDialogue() {
+        Alert errorAlert = new Alert(Alert.AlertType.INFORMATION);
+        errorAlert.setHeaderText("Please Read!");
+        errorAlert.setContentText(gradebook.getLongTermGradeInformationMessage());
+        errorAlert.showAndWait();
+    }
 
     private Scene fullGradebookView() {
-        showWarningDialogue();
+        showShortTermWarningDialogue();
         VBox parent = new VBox();
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setMinWidth(225);
         scrollPane.setContent(parent);
+        GradebookFormatter gformatter = new GradebookFormatter();
         parent.getChildren().addAll(
-                new Label(gradebook.reportAllAssinments()),
+                new Label(gformatter.reportAllAssinments(gradebook)),
                 new Label("Long Term Grade: => " + gradebook.calculateLongTermGrade() + "%"),
                 new Label("Short Term Grade: => " + gradebook.calculateShortTermGrade() + "%")
-
         );
         // buttoon to exit/open
         return new Scene(scrollPane);
