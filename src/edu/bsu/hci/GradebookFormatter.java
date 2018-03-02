@@ -1,6 +1,6 @@
 package edu.bsu.hci;
 
-public class GradebookFormatter {
+class GradebookFormatter {
 
     String reportAllAssinments(Gradebook g) {
         StringBuilder output = new StringBuilder();
